@@ -659,7 +659,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-streamlit>=1.35.0
-pandas>=2.2.2
-pip install -r requirements.txt
-streamlit run app.py
