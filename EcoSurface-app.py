@@ -259,7 +259,7 @@ baku_mutu = {
     "Fosfat": 0.2,
     "Sulfat": 400,
     "Klorida": 600,
-    "Besi (Fe)": 0.3,
+    "Besi (Fe)": 0.3,'mg/L'
     "Mangan (Mn)": 0.1,
     "DO": 4
 }
