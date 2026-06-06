@@ -1,38 +1,28 @@
-# ==========================================================
-# ECOSURFACE
-# Sistem Pendukung Pemantauan Kualitas Air Permukaan
-# Developer : Mahasiswa Politeknik AKA Bogor
-# ==========================================================
-
 import streamlit as st
 import pandas as pd
 
-# ==========================================================
+# ==================================================
 # KONFIGURASI HALAMAN
-# ==========================================================
+# ==================================================
 
 st.set_page_config(
     page_title="EcoSurface",
     page_icon="🌊",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
-# ==========================================================
-# CUSTOM CSS
-# ==========================================================
+# ==================================================
+# CSS CUSTOM
+# ==================================================
 
 st.markdown("""
 <style>
 
-#MainMenu {visibility:hidden;}
-footer {visibility:hidden;}
-
 .stApp{
     background: linear-gradient(
         180deg,
-        #F5FFF8 0%,
-        #EEF8FF 100%
+        #F4FFF8,
+        #EEF8FF
     );
 }
 
@@ -43,50 +33,40 @@ footer {visibility:hidden;}
         #1E90FF
     );
     padding:30px;
-    border-radius:22px;
+    border-radius:20px;
     color:white;
     text-align:center;
-    margin-bottom:20px;
-    box-shadow:0px 6px 18px rgba(0,0,0,0.15);
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
 }
 
 .info-card{
     background:white;
     padding:20px;
-    border-radius:18px;
-    box-shadow:0px 3px 10px rgba(0,0,0,0.10);
+    border-radius:16px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.10);
     border-left:6px solid #1E90FF;
 }
 
-.result-success{
+.success-card{
     background:#E8F5E9;
     padding:20px;
-    border-radius:18px;
+    border-radius:16px;
     border-left:8px solid #2E8B57;
-    box-shadow:0px 3px 10px rgba(0,0,0,0.10);
 }
 
-.result-danger{
+.danger-card{
     background:#FFEBEE;
     padding:20px;
-    border-radius:18px;
-    border-left:8px solid #D32F2F;
-    box-shadow:0px 3px 10px rgba(0,0,0,0.10);
-}
-
-.metric-box{
-    background:white;
-    padding:15px;
     border-radius:16px;
-    box-shadow:0px 3px 10px rgba(0,0,0,0.10);
+    border-left:8px solid #D32F2F;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ==========================================================
-# DATABASE SAMPLING
-# ==========================================================
+# ==================================================
+# DATA SAMPLING
+# ==================================================
 
 sampling_data = {
 
@@ -96,7 +76,7 @@ sampling_data = {
         "pengawet": "Tidak perlu",
         "penyimpanan": "4°C",
         "holding_time": "Segera dianalisis",
-        "catatan": "Analisis dilakukan sesegera mungkin setelah sampling."
+        "catatan": "Analisis dilakukan sesegera mungkin."
     },
 
     "Suhu": {
@@ -105,7 +85,7 @@ sampling_data = {
         "pengawet": "Tidak perlu",
         "penyimpanan": "In-situ",
         "holding_time": "Langsung diukur",
-        "catatan": "Pengukuran dilakukan langsung di lapangan."
+        "catatan": "Diukur langsung di lapangan."
     },
 
     "TSS": {
@@ -123,16 +103,16 @@ sampling_data = {
         "pengawet": "Pendinginan 4°C",
         "penyimpanan": "4°C",
         "holding_time": "7 hari",
-        "catatan": "Simpan dalam kondisi tertutup rapat."
+        "catatan": "Simpan tertutup rapat."
     },
 
     "DO": {
         "wadah": "Botol Winkler",
         "volume": "300 mL",
-        "pengawet": "Fiksasi MnSO4",
+        "pengawet": "MnSO4",
         "penyimpanan": "4°C",
         "holding_time": "8 jam",
-        "catatan": "Hindari terbentuknya gelembung udara."
+        "catatan": "Hindari gelembung udara."
     },
 
     "BOD": {
@@ -141,7 +121,7 @@ sampling_data = {
         "pengawet": "Pendinginan 4°C",
         "penyimpanan": "4°C",
         "holding_time": "48 jam",
-        "catatan": "Analisis secepat mungkin."
+        "catatan": "Analisis sesegera mungkin."
     },
 
     "COD": {
@@ -150,7 +130,7 @@ sampling_data = {
         "pengawet": "H2SO4 hingga pH < 2",
         "penyimpanan": "4°C",
         "holding_time": "28 hari",
-        "catatan": "Sampel harus segera didinginkan."
+        "catatan": "Segera didinginkan."
     },
 
     "Nitrat": {
@@ -159,7 +139,7 @@ sampling_data = {
         "pengawet": "Pendinginan 4°C",
         "penyimpanan": "4°C",
         "holding_time": "48 jam",
-        "catatan": "Hindari kontaminasi pupuk dan bahan organik."
+        "catatan": "Hindari kontaminasi pupuk."
     },
 
     "Nitrit": {
@@ -168,7 +148,7 @@ sampling_data = {
         "pengawet": "Pendinginan 4°C",
         "penyimpanan": "4°C",
         "holding_time": "48 jam",
-        "catatan": "Simpan dalam pendingin setelah sampling."
+        "catatan": "Simpan dalam pendingin."
     },
 
     "Amonia": {
@@ -177,8 +157,14 @@ sampling_data = {
         "pengawet": "H2SO4 hingga pH < 2",
         "penyimpanan": "4°C",
         "holding_time": "28 hari",
-        "catatan": "Hindari paparan sinar matahari langsung."
-    },
+        "catatan": "Jauhkan dari sinar matahari."
+    }
+}
+# ==================================================
+# LANJUTAN DATA SAMPLING
+# ==================================================
+
+sampling_data.update({
 
     "Fosfat": {
         "wadah": "Botol PE",
@@ -222,7 +208,7 @@ sampling_data = {
         "pengawet": "Tidak perlu",
         "penyimpanan": "4°C",
         "holding_time": "24 jam",
-        "catatan": "Jaga sterilitas selama pengambilan sampel."
+        "catatan": "Jaga sterilitas selama sampling."
     },
 
     "Besi (Fe)": {
@@ -242,31 +228,85 @@ sampling_data = {
         "holding_time": "6 bulan",
         "catatan": "Gunakan wadah bebas logam."
     }
-}
 
-# ==========================================================
-# DATABASE BAKU MUTU
-# ==========================================================
+})
+
+# ==================================================
+# DATA BAKU MUTU + SATUAN
+# ==================================================
 
 baku_mutu = {
-    "BOD": 3,
-    "COD": 25,
-    "TSS": 50,
-    "TDS": 1000,
-    "Nitrat": 10,
-    "Nitrit": 0.06,
-    "Amonia": 0.5,
-    "Fosfat": 0.2,
-    "Sulfat": 400,
-    "Klorida": 600,
-    "Besi (Fe)": 0.3,'mg/L'
-    "Mangan (Mn)": 0.1,
-    "DO": 4
+
+    "BOD": {
+        "nilai": 3,
+        "satuan": "mg/L"
+    },
+
+    "COD": {
+        "nilai": 25,
+        "satuan": "mg/L"
+    },
+
+    "TSS": {
+        "nilai": 50,
+        "satuan": "mg/L"
+    },
+
+    "TDS": {
+        "nilai": 1000,
+        "satuan": "mg/L"
+    },
+
+    "Nitrat": {
+        "nilai": 10,
+        "satuan": "mg/L"
+    },
+
+    "Nitrit": {
+        "nilai": 0.06,
+        "satuan": "mg/L"
+    },
+
+    "Amonia": {
+        "nilai": 0.5,
+        "satuan": "mg/L"
+    },
+
+    "Fosfat": {
+        "nilai": 0.2,
+        "satuan": "mg/L"
+    },
+
+    "Sulfat": {
+        "nilai": 400,
+        "satuan": "mg/L"
+    },
+
+    "Klorida": {
+        "nilai": 600,
+        "satuan": "mg/L"
+    },
+
+    "Besi (Fe)": {
+        "nilai": 0.3,
+        "satuan": "mg/L"
+    },
+
+    "Mangan (Mn)": {
+        "nilai": 0.1,
+        "satuan": "mg/L"
+    },
+
+    "DO": {
+        "nilai": 4,
+        "satuan": "mg/L"
+    }
+
 }
 
-# ==========================================================
+# ==================================================
 # SIDEBAR
-# ==========================================================
+# ==================================================
 
 menu = st.sidebar.radio(
     "📋 Menu Navigasi",
@@ -277,79 +317,70 @@ menu = st.sidebar.radio(
         "ℹ️ Tentang Aplikasi"
     ]
 )
-# ==========================================================
+
+# ==================================================
 # HALAMAN BERANDA
-# ==========================================================
+# ==================================================
 
 if menu == "🏠 Beranda":
 
     st.markdown("""
     <div class="hero">
         <h1>🌊 EcoSurface</h1>
-        <h4>Sistem Pendukung Pemantauan Kualitas Air Permukaan</h4>
+        <h3>Sistem Pendukung Pemantauan Kualitas Air Permukaan</h3>
     </div>
     """, unsafe_allow_html=True)
-
-    st.write("")
 
     col1, col2 = st.columns(2)
 
     with col1:
         st.metric(
-            label="🧪 Parameter Sampling",
-            value=len(sampling_data)
+            "🧪 Parameter Sampling",
+            len(sampling_data)
         )
 
     with col2:
         st.metric(
-            label="📊 Parameter Baku Mutu",
-            value=len(baku_mutu)
+            "📊 Parameter Baku Mutu",
+            len(baku_mutu)
         )
 
     st.write("")
 
-    with st.container():
+    st.markdown("""
+    <div class="info-card">
 
-        st.markdown("""
-        <div class="info-card">
+    <h3>🌿 Tentang EcoSurface</h3>
 
-        <h3>📖 Tentang EcoSurface</h3>
+    EcoSurface membantu pengguna dalam:
 
-        EcoSurface merupakan aplikasi pendukung kegiatan
-        pemantauan kualitas air permukaan yang membantu pengguna:
+    <br><br>
 
-        <br><br>
+    ✅ Menentukan kebutuhan sampling air permukaan
 
-        ✅ Menentukan kebutuhan sampling air permukaan
+    <br>
 
-        <br>
+    ✅ Menentukan wadah dan bahan pengawet
 
-        ✅ Mengetahui jenis wadah dan pengawet yang sesuai
+    <br>
 
-        <br>
+    ✅ Menentukan holding time
 
-        ✅ Menentukan holding time dan kondisi penyimpanan
+    <br>
 
-        <br>
+    ✅ Mengevaluasi hasil analisis terhadap baku mutu
 
-        ✅ Mengevaluasi hasil analisis kualitas air terhadap
-        baku mutu yang berlaku
-
-        <br><br>
-
-        Cocok digunakan oleh mahasiswa, laboratorium lingkungan,
-        dan praktisi pemantauan kualitas air.
-
-        </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
     st.write("")
 
-    st.subheader("📊 Ringkasan Baku Mutu")
+    st.subheader("📋 Daftar Baku Mutu")
 
     df_baku_mutu = pd.DataFrame({
-        "Parameter": list(baku_mutu.keys()),
-        "Nilai Baku Mutu": list(baku_mutu.values())
+        "Parameter": baku_mutu.keys(),
+        "Nilai": [v["nilai"] for v in baku_mutu.values()],
+        "Satuan": [v["satuan"] for v in baku_mutu.values()]
     })
 
     st.dataframe(
@@ -357,19 +388,18 @@ if menu == "🏠 Beranda":
         use_container_width=True,
         hide_index=True
     )
-
-# ==========================================================
+    # ==================================================
 # HALAMAN PANDUAN SAMPLING
-# ==========================================================
+# ==================================================
 
 elif menu == "🧪 Panduan Sampling":
 
     st.title("🧪 Panduan Sampling Air Permukaan")
 
     st.write("""
-    Pilih parameter kualitas air yang akan dianalisis.
+    Pilih parameter kualitas air yang akan diuji.
     Sistem akan menampilkan kebutuhan sampling,
-    pengawetan sampel, penyimpanan, dan holding time.
+    pengawetan, penyimpanan, dan holding time.
     """)
 
     parameter = st.selectbox(
@@ -381,281 +411,343 @@ elif menu == "🧪 Panduan Sampling":
 
     st.write("")
 
-    with st.container():
+    st.markdown(f"""
+    <div class="info-card">
 
-        st.markdown(f"""
-        <div class="info-card">
+    <h2>📌 {parameter}</h2>
 
-        <h2>📌 {parameter}</h2>
+    <hr>
 
-        <hr>
+    🧴 <b>Jenis Wadah</b>
 
-        🧴 <b>Jenis Wadah</b>
+    <br>
 
-        <br>
+    {data['wadah']}
 
-        {data["wadah"]}
+    <br><br>
 
-        <br><br>
+    📏 <b>Volume Minimum</b>
 
-        📏 <b>Volume Minimum</b>
+    <br>
 
-        <br>
+    {data['volume']}
 
-        {data["volume"]}
+    <br><br>
 
-        <br><br>
+    🧪 <b>Bahan Pengawet</b>
 
-        🧪 <b>Bahan Pengawet</b>
+    <br>
 
-        <br>
+    {data['pengawet']}
 
-        {data["pengawet"]}
+    <br><br>
 
-        <br><br>
+    ❄️ <b>Suhu Penyimpanan</b>
 
-        ❄️ <b>Suhu Penyimpanan</b>
+    <br>
 
-        <br>
+    {data['penyimpanan']}
 
-        {data["penyimpanan"]}
+    <br><br>
 
-        <br><br>
+    ⏳ <b>Holding Time</b>
 
-        ⏳ <b>Holding Time</b>
+    <br>
 
-        <br>
+    {data['holding_time']}
 
-        {data["holding_time"]}
+    <br><br>
 
-        <br><br>
+    📝 <b>Catatan Tambahan</b>
 
-        📝 <b>Catatan Tambahan</b>
+    <br>
 
-        <br>
+    {data['catatan']}
 
-        {data["catatan"]}
-
-        </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
     st.write("")
 
     with st.expander("📚 Informasi Tambahan"):
 
-        st.markdown(f"""
-        **Parameter yang dipilih:** {parameter}
+        st.write(f"""
+        Parameter yang dipilih adalah **{parameter}**.
 
-        Pastikan pengambilan sampel dilakukan sesuai prosedur
-        dan menggunakan wadah yang sesuai agar hasil analisis
-        laboratorium tetap representatif.
+        Pastikan pengambilan sampel dilakukan sesuai
+        metode yang berlaku agar hasil analisis
+        representatif dan akurat.
         """)
-        # ==========================================================
-# HALAMAN EVALUASI BAKU MUTU
-# ==========================================================
-
-elif menu == "📊 Evaluasi Baku Mutu":
-
-    st.title("📊 Evaluasi Baku Mutu")
-
-    st.write("""
-    Masukkan hasil analisis laboratorium untuk mengetahui
-    apakah parameter tersebut memenuhi baku mutu atau tidak.
-    """)
-
-    parameter = st.selectbox(
-        "Pilih Parameter",
-        list(baku_mutu.keys())
-    )
-
-    nilai = st.number_input(
-        "Masukkan Hasil Analisis",
-        min_value=0.0,
-        value=0.0,
-        step=0.01
-    )
 
     st.write("")
 
-    if st.button("🔍 Evaluasi", use_container_width=True):
+    col1, col2 = st.columns(2)
 
-        standar = baku_mutu[parameter]
+    with col1:
+        st.metric(
+            "📦 Wadah",
+            data["wadah"]
+        )
 
-        # ==========================================
-        # LOGIKA KHUSUS DO
-        # ==========================================
+    with col2:
+        st.metric(
+            "⏳ Holding Time",
+            data["holding_time"]
+        )
+        import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
 
-        if parameter == "DO":
-
-            memenuhi = nilai >= standar
-
-        else:
-
-            memenuhi = nilai <= standar
-
-        selisih = abs(nilai - standar)
-
-        st.write("")
-
-        if memenuhi:
-
-            st.markdown(f"""
-            <div class="result-success">
-
-            <h2>✅ MEMENUHI BAKU MUTU</h2>
-
-            <hr>
-
-            <b>Parameter</b><br>
-            {parameter}
-
-            <br><br>
-
-            <b>Hasil Analisis</b><br>
-            {nilai}
-
-            <br><br>
-
-            <b>Nilai Baku Mutu</b><br>
-            {standar}
-
-            <br><br>
-
-            <b>Selisih Nilai</b><br>
-            {selisih}
-
-            </div>
-            """, unsafe_allow_html=True)
-
-        else:
-
-            st.markdown(f"""
-            <div class="result-danger">
-
-            <h2>❌ TIDAK MEMENUHI BAKU MUTU</h2>
-
-            <hr>
-
-            <b>Parameter</b><br>
-            {parameter}
-
-            <br><br>
-
-            <b>Hasil Analisis</b><br>
-            {nilai}
-
-            <br><br>
-
-            <b>Nilai Baku Mutu</b><br>
-            {standar}
-
-            <br><br>
-
-            <b>Selisih Nilai</b><br>
-            {selisih}
-
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.write("")
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            st.metric(
-                "Hasil Analisis",
-                nilai
-            )
-
-        with col2:
-            st.metric(
-                "Baku Mutu",
-                standar
-            )
-
-        with col3:
-            st.metric(
-                "Selisih",
-                round(selisih, 3)
-            )
-
-# ==========================================================
-# HALAMAN TENTANG APLIKASI
-# ==========================================================
-
-elif menu == "ℹ️ Tentang Aplikasi":
-
-    st.title("ℹ️ Tentang Aplikasi")
-
-    with st.container():
-
-        st.markdown("""
-        <div class="info-card">
-
-        <h2>🌊 EcoSurface</h2>
-
-        <hr>
-
-        <b>Deskripsi</b>
-
-        <br><br>
-
-        Aplikasi pendukung kegiatan pemantauan kualitas air
-        permukaan yang membantu menentukan kebutuhan sampling,
-        pengawetan contoh, penyimpanan, holding time,
-        dan evaluasi hasil analisis berdasarkan baku mutu.
-
-        <br><br>
-
-        <b>Teknologi</b>
-
-        <ul>
-            <li>Python</li>
-            <li>Streamlit</li>
-            <li>Pandas</li>
-        </ul>
-
-        <b>Versi</b>
-
-        <br>
-
-        1.0
-
-        <br><br>
-
-        <b>Developer</b>
-
-        <br>
-
-        Mahasiswa Politeknik AKA Bogor
-
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.write("")
-
-    with st.expander("🎯 Tujuan Pengembangan"):
-
-        st.write("""
-        Aplikasi ini dikembangkan sebagai media pembelajaran
-        dan pendukung kegiatan pemantauan kualitas air
-        permukaan bagi mahasiswa maupun praktisi lingkungan.
-        """)
-
-# ==========================================================
-# FOOTER
-# ==========================================================
-
-st.write("")
-st.write("")
+# =========================
+# 🌿 CONFIG UI KARTUN HIJAU
+# =========================
+st.set_page_config(page_title="EcoWater Monitor", layout="wide")
 
 st.markdown(
     """
-    <center>
-    <small>
-    🌿 EcoSurface v1.0 | Sistem Pendukung Pemantauan Kualitas Air Permukaan
-    </small>
-    </center>
+    <style>
+    body {
+        background-color: #e8fff1;
+    }
+    .main {
+        background-color: #e8fff1;
+    }
+    h1 {
+        color: #2e8b57;
+        text-align: center;
+    }
+    .stButton>button {
+        background-color: #2e8b57;
+        color: white;
+        border-radius: 10px;
+    }
+    </style>
     """,
     unsafe_allow_html=True
 )
+
+st.title("💧 EcoWater Monitor (Versi Kartun Hijau)")
+
+# =========================
+# 📊 DATABASE SEDERHANA
+# =========================
+if "data" not in st.session_state:
+    st.session_state.data = pd.DataFrame(columns=[
+        "Waktu", "pH", "Suhu", "TDS"
+    ])
+
+# =========================
+# 📥 INPUT DATA
+# =========================
+st.header("📥 Input Kualitas Air")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    ph = st.number_input("pH Air", 0.0, 14.0, 7.0)
+
+with col2:
+    suhu = st.number_input("Suhu (°C)", 0.0, 100.0, 25.0)
+
+with col3:
+    tds = st.number_input("TDS (ppm)", 0, 2000, 100)
+
+if st.button("Simpan Data 🌱"):
+    new_data = {
+        "Waktu": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "pH": ph,
+        "Suhu": suhu,
+        "TDS": tds
+    }
+
+    st.session_state.data = pd.concat(
+        [st.session_state.data, pd.DataFrame([new_data])],
+        ignore_index=True
+    )
+
+    st.success("Data berhasil disimpan!")
+
+# =========================
+# 🧠 LOGIKA STATUS AIR
+# =========================
+def status_air(ph, suhu, tds):
+    if 6.5 <= ph <= 8.5 and suhu <= 30 and tds <= 500:
+        return "🟢 AMAN"
+    elif 6.0 <= ph <= 9.0:
+        return "🟡 WASPADA"
+    else:
+        return "🔴 BAHAYA"
+
+if not st.session_state.data.empty:
+    last = st.session_state.data.iloc[-1]
+    status = status_air(last["pH"], last["Suhu"], last["TDS"])
+
+    st.subheader("📌 Status Air Terbaru")
+    st.markdown(f"### {status}")
+
+# =========================
+# 📊 VISUALISASI GRAFIK
+# =========================
+st.header("📊 Grafik Kualitas Air")
+
+if not st.session_state.data.empty:
+    fig, ax = plt.subplots()
+
+    ax.plot(st.session_state.data["pH"], label="pH")
+    ax.plot(st.session_state.data["Suhu"], label="Suhu")
+    ax.plot(st.session_state.data["TDS"], label="TDS")
+
+    ax.set_title("Perubahan Parameter Air")
+    ax.legend()
+
+    st.pyplot(fig)
+else:
+    st.info("Belum ada data untuk ditampilkan.")
+
+# =========================
+# 📁 TABEL DATA
+# =========================
+st.header("📁 Riwayat Data")
+
+st.dataframe(st.session_state.data)
+import streamlit as st
+import pandas as pd
+import sqlite3
+from datetime import datetime
+import plotly.express as px
+
+# =========================
+# 🌿 UI THEME KARTUN HIJAU
+# =========================
+st.set_page_config(page_title="EcoWater Monitor Pro", layout="wide")
+
+st.markdown("""
+<style>
+body { background-color: #e9fff2; }
+h1 { color: #2e8b57; text-align: center; }
+.sidebar .sidebar-content { background-color: #d9ffe8; }
+.stButton>button {
+    background-color: #2e8b57;
+    color: white;
+    border-radius: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.title("💧 EcoWater Monitor PRO (Final Version)")
+
+# =========================
+# 🗄️ DATABASE SQLITE
+# =========================
+conn = sqlite3.connect("water.db")
+c = conn.cursor()
+
+c.execute("""
+CREATE TABLE IF NOT EXISTS water_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    waktu TEXT,
+    ph REAL,
+    suhu REAL,
+    tds REAL
+)
+""")
+conn.commit()
+
+# =========================
+# 📥 SIDEBAR NAVIGASI
+# =========================
+menu = st.sidebar.selectbox(
+    "📌 Menu",
+    ["Input Data", "Dashboard", "Riwayat", "Download"]
+)
+
+# =========================
+# 🧠 FUNGSI STATUS AIR
+# =========================
+def status_air(ph, suhu, tds):
+    if 6.5 <= ph <= 8.5 and suhu <= 30 and tds <= 500:
+        return "🟢 AMAN"
+    elif 6.0 <= ph <= 9.0:
+        return "🟡 WASPADA"
+    else:
+        return "🔴 BAHAYA"
+
+# =========================
+# 📥 INPUT DATA
+# =========================
+if menu == "Input Data":
+    st.header("📥 Input Data Kualitas Air")
+
+    ph = st.number_input("pH", 0.0, 14.0, 7.0)
+    suhu = st.number_input("Suhu (°C)", 0.0, 100.0, 25.0)
+    tds = st.number_input("TDS (ppm)", 0, 2000, 100)
+
+    if st.button("Simpan 🌱"):
+        waktu = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        c.execute(
+            "INSERT INTO water_data (waktu, ph, suhu, tds) VALUES (?, ?, ?, ?)",
+            (waktu, ph, suhu, tds)
+        )
+        conn.commit()
+
+        st.success("Data berhasil disimpan!")
+
+        status = status_air(ph, suhu, tds)
+
+        if "BAHAYA" in status:
+            st.error("🚨 PERINGATAN! Kualitas air berbahaya!")
+        elif "WASPADA" in status:
+            st.warning("⚠️ Kualitas air tidak stabil!")
+        else:
+            st.success("✅ Air dalam kondisi aman!")
+
+# =========================
+# 📊 DASHBOARD
+# =========================
+elif menu == "Dashboard":
+    st.header("📊 Dashboard Analisis")
+
+    df = pd.read_sql("SELECT * FROM water_data", conn)
+
+    if not df.empty:
+        fig = px.line(df, x="waktu", y=["ph", "suhu", "tds"],
+                      title="Tren Kualitas Air",
+                      markers=True)
+        st.plotly_chart(fig, use_container_width=True)
+
+        last = df.iloc[-1]
+        st.subheader("📌 Status Terbaru")
+
+        status = status_air(last["ph"], last["suhu"], last["tds"])
+        st.markdown(f"### {status}")
+
+    else:
+        st.info("Belum ada data.")
+
+# =========================
+# 📁 RIWAYAT DATA
+# =========================
+elif menu == "Riwayat":
+    st.header("📁 Data Tersimpan")
+
+    df = pd.read_sql("SELECT * FROM water_data", conn)
+    st.dataframe(df)
+
+# =========================
+# 📥 DOWNLOAD LAPORAN
+# =========================
+elif menu == "Download":
+    st.header("📥 Download Laporan CSV")
+
+    df = pd.read_sql("SELECT * FROM water_data", conn)
+
+    csv = df.to_csv(index=False).encode('utf-8')
+
+    st.download_button(
+        "⬇️ Download Data",
+        csv,
+        "laporan_kualitas_air.csv",
+        "text/csv"
+    )
