@@ -1,498 +1,235 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
+from data.parameter_data import sampling_data, baku_mutu
 
 # =========================
-# ⚙️ SETTING HALAMAN (BIAR RAPI)
-# =========================
-st.set_page_config(
-    page_title="EcoWater",
-    layout="centered"
-)
-
-# =========================
-# 🧠 DATA TEMPORARY
-# =========================
-if "data" not in st.session_state:
-    st.session_state.data = pd.DataFrame(
-        columns=["Waktu", "pH", "Suhu", "TDS"]
-    )
-
-# =========================
-# 🌿 JUDUL
-# =========================
-st.title("💧 EcoWater Monitor")
-
-st.write("Input sederhana kualitas air")
-
-# =========================
-# 📥 INPUT (DIBUAT COMPACT)
-# =========================
-ph = st.number_input("pH", 0.0, 14.0, 7.0)
-suhu = st.number_input("Suhu (°C)", 0.0, 100.0, 25.0)
-tds = st.number_input("TDS (ppm)", 0, 2000, 100)
-
-# =========================
-# 💾 SIMPAN DATA
-# =========================
-if st.button("Simpan"):
-    data_baru = {
-        "Waktu": datetime.now().strftime("%H:%M:%S"),
-        "pH": ph,
-        "Suhu": suhu,
-        "TDS": tds
-    }
-
-    st.session_state.data = pd.concat(
-        [st.session_state.data, pd.DataFrame([data_baru])],
-        ignore_index=True
-    )
-
-    st.success("Tersimpan!")
-
-# =========================
-# 📁 TAMPILAN DATA
-# =========================
-st.subheader("Data Masuk")
-
-st.dataframe(
-    st.session_state.data,
-    use_container_width=True
-)
-import streamlit as st
-import pandas as pd
-from datetime import datetime
-
-# =========================
-# ⚙️ SETTING HALAMAN
+# ⚙️ CONFIG UI
 # =========================
 st.set_page_config(
-    page_title="EcoWater",
-    layout="centered"
+    page_title="EcoSurface",
+    layout="wide",
+    page_icon="🌊"
 )
 
 # =========================
-# 🧠 DATA
+# 🎨 GLOBAL CSS (UI MODERN)
 # =========================
-if "data" not in st.session_state:
-    st.session_state.data = pd.DataFrame(
-        columns=["Waktu", "pH", "Suhu", "TDS"]
-    )
+st.markdown("""
+<style>
+body {
+    background-color: #FFFFFF;
+}
+
+.block-container {
+    padding: 1.5rem 2rem;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    border-left: 6px solid #2E8B57;
+}
+
+.good {
+    color: #2E8B57;
+    font-weight: bold;
+}
+
+.bad {
+    color: #FF4B4B;
+    font-weight: bold;
+}
+
+h1, h2, h3 {
+    color: #1E90FF;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # =========================
-# 🌿 JUDUL
+# 📌 SIDEBAR NAVIGASI
 # =========================
-st.title("💧 EcoWater Monitor")
-
-st.write("Monitoring kualitas air sederhana")
-
-# =========================
-# 📥 INPUT
-# =========================
-ph = st.number_input("pH", 0.0, 14.0, 7.0)
-suhu = st.number_input("Suhu (°C)", 0.0, 100.0, 25.0)
-tds = st.number_input("TDS (ppm)", 0, 2000, 100)
-
-# =========================
-# 🧠 FUNGSI STATUS AIR
-# =========================
-def status_air(ph, suhu, tds):
-    if 6.5 <= ph <= 8.5 and suhu <= 30 and tds <= 500:
-        return "🟢 AMAN"
-    elif 6.0 <= ph <= 9.0:
-        return "🟡 WASPADA"
-    else:
-        return "🔴 BAHAYA"
-
-# =========================
-# 💾 SIMPAN DATA
-# =========================
-if st.button("Simpan"):
-    status = status_air(ph, suhu, tds)
-
-    data_baru = {
-        "Waktu": datetime.now().strftime("%H:%M:%S"),
-        "pH": ph,
-        "Suhu": suhu,
-        "TDS": tds
-    }
-
-    st.session_state.data = pd.concat(
-        [st.session_state.data, pd.DataFrame([data_baru])],
-        ignore_index=True
-    )
-
-    st.success("Data tersimpan!")
-
-    # =========================
-    # 📌 STATUS LANGSUNG MUNCUL
-    # =========================
-    st.subheader("Status Air")
-
-    if status == "🟢 AMAN":
-        st.success(status)
-    elif status == "🟡 WASPADA":
-        st.warning(status)
-    else:
-        st.error(status)
-
-# =========================
-# 📁 DATA
-# =========================
-st.subheader("Riwayat Data")
-
-st.dataframe(
-    st.session_state.data,
-    use_container_width=True
-)
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-from datetime import datetime
-
-# =========================
-# ⚙️ SETTING HALAMAN
-# =========================
-st.set_page_config(
-    page_title="EcoWater",
-    layout="centered"
+menu = st.sidebar.radio(
+    "📌 Menu EcoSurface",
+    ["🏠 Beranda", "🧪 Panduan Sampling", "📊 Evaluasi Baku Mutu", "ℹ️ Tentang Aplikasi"]
 )
 
 # =========================
-# 🧠 DATA
+# 🏠 BERANDA
 # =========================
-if "data" not in st.session_state:
-    st.session_state.data = pd.DataFrame(
-        columns=["Waktu", "pH", "Suhu", "TDS"]
-    )
+if menu == "🏠 Beranda":
 
-# =========================
-# 🌿 JUDUL
-# =========================
-st.title("💧 EcoWater Monitor")
-st.write("Monitoring kualitas air sederhana")
+    st.title("🌊 EcoSurface")
+    st.subheader("Sistem Pendukung Pemantauan Kualitas Air Permukaan")
 
-# =========================
-# 📥 INPUT
-# =========================
-ph = st.number_input("pH", 0.0, 14.0, 7.0)
-suhu = st.number_input("Suhu (°C)", 0.0, 100.0, 25.0)
-tds = st.number_input("TDS (ppm)", 0, 2000, 100)
+    st.write("Aplikasi ini membantu dalam penentuan sampling dan evaluasi kualitas air berdasarkan baku mutu.")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric("📦 Parameter Sampling", len(sampling_data))
+
+    with col2:
+        st.metric("⚖️ Parameter Baku Mutu", len(baku_mutu))
 
 # =========================
-# 🧠 FUNGSI STATUS
+# 🧪 PANDUAN SAMPLING
 # =========================
-def status_air(ph, suhu, tds):
-    if 6.5 <= ph <= 8.5 and suhu <= 30 and tds <= 500:
-        return "🟢 AMAN"
-    elif 6.0 <= ph <= 9.0:
-        return "🟡 WASPADA"
-    else:
-        return "🔴 BAHAYA"
+elif menu == "🧪 Panduan Sampling":
 
-# =========================
-# 💾 SIMPAN DATA
-# =========================
-if st.button("Simpan"):
-    status = status_air(ph, suhu, tds)
+    st.title("🧪 Panduan Sampling Air Permukaan")
 
-    data_baru = {
-        "Waktu": datetime.now().strftime("%H:%M:%S"),
-        "pH": ph,
-        "Suhu": suhu,
-        "TDS": tds
-    }
+    param = st.selectbox("Pilih Parameter", list(sampling_data.keys()))
 
-    st.session_state.data = pd.concat(
-        [st.session_state.data, pd.DataFrame([data_baru])],
-        ignore_index=True
-    )
+    data = sampling_data[param]
 
-    st.success("Data tersimpan!")
-
-    # STATUS
-    if status == "🟢 AMAN":
-        st.success(status)
-    elif status == "🟡 WASPADA":
-        st.warning(status)
-    else:
-        st.error(status)
+    with st.container():
+        st.markdown(f"""
+        <div class="card">
+        <h3>📌 {param}</h3>
+        <p>🧴 Wadah: {data['wadah']}</p>
+        <p>📦 Volume: {data['volume']}</p>
+        <p>🧪 Pengawet: {data['pengawet']}</p>
+        <p>❄️ Penyimpanan: {data['penyimpanan']}</p>
+        <p>⏳ Holding Time: {data['holding_time']}</p>
+        <p>📝 Catatan: {data['catatan']}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 # =========================
-# 📊 GRAFIK (TAHAP 3)
+# 📊 EVALUASI BAKU MUTU
 # =========================
-st.subheader("📊 Grafik Monitoring")
+elif menu == "📊 Evaluasi Baku Mutu":
 
-if not st.session_state.data.empty:
+    st.title("📊 Evaluasi Baku Mutu")
 
-    fig, ax = plt.subplots()
+    param = st.selectbox("Pilih Parameter", list(baku_mutu.keys()))
+    nilai = st.number_input("Masukkan Nilai Hasil Analisis")
 
-    ax.plot(st.session_state.data["pH"], label="pH")
-    ax.plot(st.session_state.data["Suhu"], label="Suhu")
-    ax.plot(st.session_state.data["TDS"], label="TDS")
+    if st.button("Evaluasi"):
 
-    ax.set_title("Perubahan Kualitas Air")
-    ax.legend()
+        batas = baku_mutu[param]
 
-    st.pyplot(fig)
-
-else:
-    st.info("Belum ada data untuk grafik.")
-
-# =========================
-# 📁 DATA
-# =========================
-st.subheader("Riwayat Data")
-
-st.dataframe(
-    st.session_state.data,
-    use_container_width=True
-)
-import streamlit as st
-import pandas as pd
-from datetime import datetime
-import plotly.express as px
-
-# =========================
-# ⚙️ SETTING
-# =========================
-st.set_page_config(
-    page_title="EcoWater Pro",
-    layout="wide"
-)
-
-# =========================
-# 🧠 DATA
-# =========================
-if "data" not in st.session_state:
-    st.session_state.data = pd.DataFrame(
-        columns=["Waktu", "pH", "Suhu", "TDS"]
-    )
-
-# =========================
-# 🧠 STATUS AIR
-# =========================
-def status_air(ph, suhu, tds):
-    if 6.5 <= ph <= 8.5 and suhu <= 30 and tds <= 500:
-        return "🟢 AMAN"
-    elif 6.0 <= ph <= 9.0:
-        return "🟡 WASPADA"
-    else:
-        return "🔴 BAHAYA"
-
-# =========================
-# 📌 SIDEBAR MENU
-# =========================
-menu = st.sidebar.selectbox(
-    "📌 Menu",
-    ["Input Data", "Dashboard", "Riwayat"]
-)
-
-# =========================
-# 🌿 INPUT DATA
-# =========================
-if menu == "Input Data":
-
-    st.title("💧 Input Data")
-
-    ph = st.number_input("pH", 0.0, 14.0, 7.0)
-    suhu = st.number_input("Suhu (°C)", 0.0, 100.0, 25.0)
-    tds = st.number_input("TDS (ppm)", 0, 2000, 100)
-
-    if st.button("Simpan"):
-        waktu = datetime.now().strftime("%H:%M:%S")
-
-        st.session_state.data = pd.concat(
-            [st.session_state.data, pd.DataFrame([{
-                "Waktu": waktu,
-                "pH": ph,
-                "Suhu": suhu,
-                "TDS": tds
-            }])],
-            ignore_index=True
-        )
-
-        st.success("Data tersimpan!")
-
-        status = status_air(ph, suhu, tds)
-
-        if status == "🟢 AMAN":
-            st.success(status)
-        elif status == "🟡 WASPADA":
-            st.warning(status)
+        # =========================
+        # LOGIKA DO (MINIMUM)
+        # =========================
+        if param == "DO":
+            if nilai >= batas:
+                status = "✅ MEMENUHI BAKU MUTU"
+                color = "good"
+            else:
+                status = "❌ TIDAK MEMENUHI BAKU MUTU"
+                color = "bad"
         else:
-            st.error(status)
+            if nilai <= batas:
+                status = "✅ MEMENUHI BAKU MUTU"
+                color = "good"
+            else:
+                status = "❌ TIDAK MEMENUHI BAKU MUTU"
+                color = "bad"
+
+        selisih = abs(nilai - batas)
+
+        st.markdown(f"""
+        <div class="card">
+        <h2 class="{color}">{status}</h2>
+        <p>📌 Nilai Hasil: {nilai}</p>
+        <p>⚖️ Baku Mutu: {batas}</p>
+        <p>📏 Selisih: {selisih}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 # =========================
-# 📊 DASHBOARD
+# ℹ️ TENTANG
 # =========================
-elif menu == "Dashboard":
+elif menu == "ℹ️ Tentang Aplikasi":
 
-    st.title("📊 Dashboard Monitoring")
+    st.title("ℹ️ Tentang Aplikasi")
 
-    if not st.session_state.data.empty:
+    st.markdown("""
+    **Nama:** EcoSurface  
 
-        fig = px.line(
-            st.session_state.data,
-            x="Waktu",
-            y=["pH", "Suhu", "TDS"],
-            markers=True,
-            title="Grafik Kualitas Air"
-        )
+    **Deskripsi:**  
+    Aplikasi pendukung pemantauan kualitas air permukaan yang membantu sampling, pengawetan, penyimpanan, dan evaluasi baku mutu.
 
-        st.plotly_chart(fig, use_container_width=True)
+    **Teknologi:**  
+    - Python  
+    - Streamlit  
 
-    else:
-        st.info("Belum ada data")
+    **Versi:** 1.0  
 
+    **Developer:** Mahasiswa Politeknik AKA Bogor
+    """)
 # =========================
-# 📁 RIWAYAT
+# 🧪 DATA SAMPLING PARAMETER
 # =========================
-elif menu == "Riwayat":
-
-    st.title("📁 Data Tersimpan")
-
-    st.dataframe(
-        st.session_state.data,
-        use_container_width=True
-    )
-    import streamlit as st
-import pandas as pd
-import sqlite3
-from datetime import datetime
-import plotly.express as px
-
-# =========================
-# ⚙️ SETTING
-# =========================
-st.set_page_config(
-    page_title="EcoWater Final",
-    layout="wide"
-)
-
-# =========================
-# 🗄️ DATABASE SQLITE
-# =========================
-conn = sqlite3.connect("water.db", check_same_thread=False)
-c = conn.cursor()
-
-c.execute("""
-CREATE TABLE IF NOT EXISTS water_data (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    waktu TEXT,
-    ph REAL,
-    suhu REAL,
-    tds REAL
-)
-""")
-conn.commit()
+sampling_data = {
+    "COD": {
+        "wadah": "Botol PE",
+        "volume": "500 mL",
+        "pengawet": "H2SO4 hingga pH < 2",
+        "penyimpanan": "4°C",
+        "holding_time": "28 hari",
+        "catatan": "Sampel harus segera didinginkan setelah pengambilan."
+    },
+    "BOD": {
+        "wadah": "Botol kaca gelap",
+        "volume": "300 mL",
+        "pengawet": "Tidak boleh diawetkan",
+        "penyimpanan": "4°C",
+        "holding_time": "48 jam",
+        "catatan": "Hindari kontak udara berlebih."
+    },
+    "TSS": {
+        "wadah": "Botol PE",
+        "volume": "1 L",
+        "pengawet": "Tidak perlu",
+        "penyimpanan": "4°C",
+        "holding_time": "7 hari",
+        "catatan": "Sampel harus homogen."
+    },
+    "TDS": {
+        "wadah": "Botol PE",
+        "volume": "500 mL",
+        "pengawet": "Tidak perlu",
+        "penyimpanan": "4°C",
+        "holding_time": "7 hari",
+        "catatan": "Simpan tertutup rapat."
+    }
+}
 
 # =========================
-# 🧠 STATUS AIR
+# ⚖️ BAKU MUTU
 # =========================
-def status_air(ph, suhu, tds):
-    if 6.5 <= ph <= 8.5 and suhu <= 30 and tds <= 500:
-        return "🟢 AMAN"
-    elif 6.0 <= ph <= 9.0:
-        return "🟡 WASPADA"
-    else:
-        return "🔴 BAHAYA"
+baku_mutu = {
+    "BOD": 3,
+    "COD": 25,
+    "TSS": 50,
+    "TDS": 1000,
+    "Nitrat": 10,
+    "Nitrit": 0.06,
+    "Amonia": 0.5,
+    "Fosfat": 0.2,
+    "Sulfat": 400,
+    "Klorida": 600,
+    "Besi (Fe)": 0.3,
+    "Mangan (Mn)": 0.1,
+    "DO": 4
+}
+    streamlit>=1.35.0
+    # 🌊 EcoSurface
 
-# =========================
-# 📌 MENU SIDEBAR
-# =========================
-menu = st.sidebar.selectbox(
-    "📌 Menu",
-    ["Input Data", "Dashboard", "Riwayat", "Download"]
-)
+EcoSurface adalah aplikasi berbasis Streamlit untuk mendukung pemantauan kualitas air permukaan.
 
-# =========================
-# 📥 INPUT DATA
-# =========================
-if menu == "Input Data":
+## ✨ Fitur
+- Panduan sampling air
+- Evaluasi baku mutu
+- Dashboard sederhana
+- UI modern dan responsif
 
-    st.title("💧 Input Data Kualitas Air")
+## 🚀 Cara Menjalankan
 
-    ph = st.number_input("pH", 0.0, 14.0, 7.0)
-    suhu = st.number_input("Suhu (°C)", 0.0, 100.0, 25.0)
-    tds = st.number_input("TDS (ppm)", 0, 2000, 100)
-
-    if st.button("Simpan 🌱"):
-        waktu = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        c.execute(
-            "INSERT INTO water_data (waktu, ph, suhu, tds) VALUES (?, ?, ?, ?)",
-            (waktu, ph, suhu, tds)
-        )
-        conn.commit()
-
-        status = status_air(ph, suhu, tds)
-
-        st.success("Data tersimpan!")
-
-        # 🚨 ALARM
-        if status == "🔴 BAHAYA":
-            st.error("🚨 KUALITAS AIR BERBAHAYA!")
-        elif status == "🟡 WASPADA":
-            st.warning("⚠️ Kualitas air tidak stabil")
-        else:
-            st.success("🟢 Air dalam kondisi aman")
-
-# =========================
-# 📊 DASHBOARD
-# =========================
-elif menu == "Dashboard":
-
-    st.title("📊 Dashboard Monitoring")
-
-    df = pd.read_sql("SELECT * FROM water_data", conn)
-
-    if not df.empty:
-
-        fig = px.line(
-            df,
-            x="waktu",
-            y=["ph", "suhu", "tds"],
-            markers=True,
-            title="Grafik Kualitas Air"
-        )
-
-        st.plotly_chart(fig, use_container_width=True)
-
-        last = df.iloc[-1]
-        status = status_air(last["ph"], last["suhu"], last["tds"])
-
-        st.subheader("📌 Status Terbaru")
-        st.markdown(f"### {status}")
-
-    else:
-        st.info("Belum ada data")
-
-# =========================
-# 📁 RIWAYAT
-# =========================
-elif menu == "Riwayat":
-
-    st.title("📁 Data Tersimpan")
-
-    df = pd.read_sql("SELECT * FROM water_data", conn)
-
-    st.dataframe(df, use_container_width=True)
-
-# =========================
-# 📥 DOWNLOAD CSV
-# =========================
-elif menu == "Download":
-
-    st.title("📥 Download Laporan")
-
-    df = pd.read_sql("SELECT * FROM water_data", conn)
-
-    csv = df.to_csv(index=False).encode("utf-8")
-
-    st.download_button(
-        "⬇️ Download CSV",
-        csv,
-        "laporan_air.csv",
-        "text/csv"
-    )
+```bash
+pip install -r requirements.txt
+streamlit run app.py
