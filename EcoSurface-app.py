@@ -1,353 +1,343 @@
-EcoSurface/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-│
-├── assets/
-│   └── logo.png
-│
-└── data/
-    └── parameter_data.py
-# =====================================
-# DATABASE PARAMETER SAMPLING
-# =====================================
+# ==========================================================
+# ECOSURFACE
+# Sistem Pendukung Pemantauan Kualitas Air Permukaan
+# Developer : Mahasiswa Politeknik AKA Bogor
+# Versi : 1.0
+# ==========================================================
 
-sampling_data = {
-    "pH": {
-        "wadah": "Botol PE",
-        "volume": "250 mL",
-        "pengawet": "Tidak perlu",
-        "penyimpanan": "4°C",
-        "holding_time": "Segera dianalisis",
-        "catatan": "Hindari paparan panas."
-    },
+import streamlit as st
+import pandas as pd
 
-    "Suhu": {
-        "wadah": "Botol PE",
-        "volume": "-",
-        "pengawet": "Tidak perlu",
-        "penyimpanan": "In-situ",
-        "holding_time": "Langsung diukur",
-        "catatan": "Dilakukan di lapangan."
-    },
-
-    "DO": {
-        "wadah": "Botol Winkler",
-        "volume": "300 mL",
-        "pengawet": "Fiksasi MnSO4",
-        "penyimpanan": "4°C",
-        "holding_time": "8 jam",
-        "catatan": "Hindari gelembung udara."
-    },
-
-    "BOD": {
-        "wadah": "Botol PE",
-        "volume": "1000 mL",
-        "pengawet": "Pendinginan 4°C",
-        "penyimpanan": "4°C",
-        "holding_time": "48 jam",
-        "catatan": "Analisis sesegera mungkin."
-    },
-
-    "COD": {
-        "wadah": "Botol PE",
-        "volume": "500 mL",
-        "pengawet": "H2SO4 hingga pH < 2",
-        "penyimpanan": "4°C",
-        "holding_time": "28 hari",
-        "catatan": "Segera didinginkan."
-    }
-}
-
-# =====================================
-# DATABASE BAKU MUTU
-# =====================================
-
-baku_mutu = {
-    "BOD": 3,
-    "COD": 25,
-    "TSS": 50,
-    "TDS": 1000,
-    "Nitrat": 10,
-    "Nitrit": 0.06,
-    "Amonia": 0.5,
-    "Fosfat": 0.2,
-    "Sulfat": 400,
-    "Klorida": 600,
-    "Besi (Fe)": 0.3,
-    "Mangan (Mn)": 0.1,
-    "DO": 4
-}
-         import streamlit as st
-from data.parameter_data import sampling_data, baku_mutu
-
-# =====================================
-# PAGE CONFIG
-# =====================================
+# ==========================================================
+# KONFIGURASI HALAMAN
+# ==========================================================
 
 st.set_page_config(
     page_title="EcoSurface",
     page_icon="🌊",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# =====================================
+# ==========================================================
 # CUSTOM CSS
-# =====================================
+# ==========================================================
 
 st.markdown("""
 <style>
 
-.main {
-    background-color: #F7FBFF;
+/* =======================================================
+BACKGROUND
+======================================================= */
+
+.stApp{
+    background: linear-gradient(
+        180deg,
+        #F4FFF8 0%,
+        #F8FFFD 40%,
+        #EEF8FF 100%
+    );
 }
 
-.hero {
-    background: linear-gradient(135deg,#2E8B57,#1E90FF);
-    padding:25px;
-    border-radius:20px;
+/* =======================================================
+HEADER
+======================================================= */
+
+.hero{
+    background: linear-gradient(
+        135deg,
+        #2E8B57,
+        #1E90FF
+    );
+
+    padding:30px;
+    border-radius:22px;
     color:white;
     text-align:center;
-    margin-bottom:20px;
+
+    box-shadow:
+    0px 6px 18px rgba(0,0,0,0.15);
 }
 
-.metric-card {
+/* =======================================================
+CARD
+======================================================= */
+
+.info-card{
+
     background:white;
-    padding:15px;
-    border-radius:15px;
-    box-shadow:0px 3px 10px rgba(0,0,0,0.1);
+
+    border-radius:18px;
+
+    padding:22px;
+
+    margin-top:10px;
+
+    box-shadow:
+    0px 4px 12px rgba(0,0,0,0.08);
+
+    border-left:6px solid #2E8B57;
+
+    transition:0.3s;
 }
 
-.info-card {
-    background:white;
-    padding:20px;
-    border-radius:15px;
-    box-shadow:0px 3px 10px rgba(0,0,0,0.1);
-    border-left:5px solid #1E90FF;
+.info-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0px 8px 20px rgba(0,0,0,0.15);
 }
 
-.success-card {
+/* =======================================================
+SUCCESS CARD
+======================================================= */
+
+.success-card{
+
     background:#E8F5E9;
-    padding:20px;
-    border-radius:15px;
-    border-left:6px solid green;
+
+    border-left:8px solid #2E8B57;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    box-shadow:
+    0px 4px 12px rgba(0,0,0,0.08);
 }
 
-.danger-card {
+/* =======================================================
+DANGER CARD
+======================================================= */
+
+.danger-card{
+
     background:#FFEBEE;
+
+    border-left:8px solid #D32F2F;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    box-shadow:
+    0px 4px 12px rgba(0,0,0,0.08);
+}
+
+/* =======================================================
+FOOTER
+======================================================= */
+
+.footer{
+
+    text-align:center;
+
+    color:#666;
+
     padding:20px;
-    border-radius:15px;
-    border-left:6px solid red;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# =====================================
-# SIDEBAR
-# =====================================
+# ==========================================================
+# DATABASE PANDUAN SAMPLING
+# ==========================================================
 
-menu = st.sidebar.radio(
-    "📌 Navigasi",
-    [
-        "🏠 Beranda",
-        "🧪 Panduan Sampling",
-        "📊 Evaluasi Baku Mutu",
-        "ℹ️ Tentang Aplikasi"
-    ]
-)
+sampling_data = {
 
-# =====================================
-# BERANDA
-# =====================================
+    "pH":{
 
-if menu == "🏠 Beranda":
+        "wadah":"Botol PE",
 
-    st.markdown("""
-    <div class="hero">
-    <h1>🌊 EcoSurface</h1>
-    <h4>Sistem Pendukung Pemantauan Kualitas Air Permukaan</h4>
-    </div>
-    """, unsafe_allow_html=True)
+        "volume":"250 mL",
 
-    col1, col2 = st.columns(2)
+        "pengawet":"Tidak perlu",
 
-    with col1:
-        st.metric(
-            "Parameter Sampling",
-            len(sampling_data)
-        )
+        "penyimpanan":"4°C",
 
-    with col2:
-        st.metric(
-            "Parameter Baku Mutu",
-            len(baku_mutu)
-        )
+        "holding_time":"Segera dianalisis",
 
-    st.markdown("---")
+        "catatan":"Pengukuran sebaiknya dilakukan sesegera mungkin."
+    },
 
-    st.info("""
-    EcoSurface membantu menentukan kebutuhan sampling,
-    pengawetan sampel, holding time,
-    serta evaluasi hasil analisis kualitas air.
-    """)
+    "Suhu":{
 
-# =====================================
-# PANDUAN SAMPLING
-# =====================================
+        "wadah":"Botol PE",
 
-elif menu == "🧪 Panduan Sampling":
+        "volume":"Tidak diperlukan",
 
-    st.title("🧪 Panduan Sampling")
+        "pengawet":"Tidak perlu",
 
-    parameter = st.selectbox(
-        "Pilih Parameter",
-        list(sampling_data.keys())
-    )
+        "penyimpanan":"In-situ",
 
-    data = sampling_data[parameter]
+        "holding_time":"Langsung diukur",
 
-    with st.container():
+        "catatan":"Dilakukan langsung di lapangan."
+    },
 
-        st.markdown(f"""
-        <div class="info-card">
+    "TSS":{
 
-        <h3>📌 {parameter}</h3>
+        "wadah":"Botol PE",
 
-        <b>🧴 Wadah</b><br>
-        {data['wadah']}<br><br>
+        "volume":"1000 mL",
 
-        <b>📏 Volume</b><br>
-        {data['volume']}<br><br>
+        "pengawet":"Pendinginan 4°C",
 
-        <b>🧪 Pengawet</b><br>
-        {data['pengawet']}<br><br>
+        "penyimpanan":"4°C",
 
-        <b>❄️ Penyimpanan</b><br>
-        {data['penyimpanan']}<br><br>
+        "holding_time":"7 hari",
 
-        <b>⏳ Holding Time</b><br>
-        {data['holding_time']}<br><br>
+        "catatan":"Jangan disaring sebelum analisis."
+    },
 
-        <b>📝 Catatan</b><br>
-        {data['catatan']}
+    "TDS":{
 
-        </div>
-        """, unsafe_allow_html=True)
+        "wadah":"Botol PE",
 
-# =====================================
-# EVALUASI
-# =====================================
+        "volume":"500 mL",
 
-elif menu == "📊 Evaluasi Baku Mutu":
+        "pengawet":"Pendinginan 4°C",
 
-    st.title("📊 Evaluasi Baku Mutu")
+        "penyimpanan":"4°C",
 
-    parameter = st.selectbox(
-        "Parameter",
-        list(baku_mutu.keys())
-    )
+        "holding_time":"7 hari",
 
-    nilai = st.number_input(
-        "Hasil Analisis",
-        min_value=0.0,
-        value=0.0
-    )
+        "catatan":"Simpan dalam kondisi tertutup."
+    },
 
-    if st.button("Evaluasi"):
+    "DO":{
 
-        standar = baku_mutu[parameter]
+        "wadah":"Botol Winkler",
 
-        if parameter == "DO":
-            memenuhi = nilai >= standar
-        else:
-            memenuhi = nilai <= standar
+        "volume":"300 mL",
 
-        selisih = abs(nilai - standar)
+        "pengawet":"MnSO₄ dan Alkali Iodida",
 
-        if memenuhi:
+        "penyimpanan":"4°C",
 
-            st.markdown(f"""
-            <div class='success-card'>
+        "holding_time":"8 jam",
 
-            <h2>✅ MEMENUHI BAKU MUTU</h2>
+        "catatan":"Hindari terbentuknya gelembung."
+    },
 
-            <b>Hasil Analisis :</b> {nilai}<br>
-            <b>Baku Mutu :</b> {standar}<br>
-            <b>Selisih :</b> {selisih}
+    "BOD":{
 
-            </div>
-            """, unsafe_allow_html=True)
+        "wadah":"Botol PE",
 
-        else:
+        "volume":"1000 mL",
 
-            st.markdown(f"""
-            <div class='danger-card'>
+        "pengawet":"Pendinginan 4°C",
 
-            <h2>❌ TIDAK MEMENUHI BAKU MUTU</h2>
+        "penyimpanan":"4°C",
 
-            <b>Hasil Analisis :</b> {nilai}<br>
-            <b>Baku Mutu :</b> {standar}<br>
-            <b>Selisih :</b> {selisih}
+        "holding_time":"48 jam",
 
-            </div>
-            """, unsafe_allow_html=True)
+        "catatan":"Analisis sesegera mungkin."
+    },
 
-# =====================================
-# TENTANG
-# =====================================
+    "COD":{
 
-elif menu == "ℹ️ Tentang Aplikasi":
+        "wadah":"Botol PE",
 
-    st.title("ℹ️ Tentang Aplikasi")
+        "volume":"500 mL",
 
-    with st.expander("Informasi Aplikasi", expanded=True):
+        "pengawet":"H₂SO₄ hingga pH < 2",
 
-        st.markdown("""
-        ### Nama Aplikasi
-        EcoSurface
+        "penyimpanan":"4°C",
 
-        ### Deskripsi
-        Aplikasi pendukung kegiatan pemantauan kualitas air permukaan
-        yang membantu menentukan kebutuhan sampling,
-        pengawetan contoh,
-        penyimpanan,
-        holding time,
-        serta evaluasi hasil analisis
-        berdasarkan baku mutu.
+        "holding_time":"28 hari",
 
-        ### Teknologi
-        - Python
-        - Streamlit
+        "catatan":"Segera didinginkan setelah sampling."
+    },
 
-        ### Versi
-        1.0
+    "Nitrat":{
 
-        ### Developer
-        Mahasiswa Politeknik AKA Bogor
-        
-        streamlit>=1.35.0
-pandas>=2.2.2
-# EcoSurface
+        "wadah":"Botol PE",
 
-Aplikasi Streamlit untuk pemantauan kualitas air permukaan.
+        "volume":"500 mL",
 
-## Fitur
+        "pengawet":"Pendinginan 4°C",
 
-- Panduan Sampling
-- Evaluasi Baku Mutu
-- Dashboard Ringkas
-- UI Modern
+        "penyimpanan":"4°C",
 
-## Instalasi
+        "holding_time":"48 jam",
 
-```bash
-pip install -r requirements.txt
-```
+        "catatan":"Hindari kontaminasi pupuk."
+    },
 
-## Menjalankan
+    "Nitrit":{
 
-```bash
-streamlit run app.py
-```
+        "wadah":"Botol PE",
+
+        "volume":"500 mL",
+
+        "pengawet":"Pendinginan 4°C",
+
+        "penyimpanan":"4°C",
+
+        "holding_time":"48 jam",
+
+        "catatan":"Simpan dalam pendingin."
+    },
+
+    "Amonia":{
+
+        "wadah":"Botol PE",
+
+        "volume":"500 mL",
+
+        "pengawet":"H₂SO₄ hingga pH < 2",
+
+        "penyimpanan":"4°C",
+
+        "holding_time":"28 hari",
+
+        "catatan":"Hindari paparan sinar matahari."
+    },
+
+    "Fosfat":{
+
+        "wadah":"Botol PE",
+
+        "volume":"500 mL",
+
+        "pengawet":"Pendinginan 4°C",
+
+        "penyimpanan":"4°C",
+
+        "holding_time":"48 jam",
+
+        "catatan":"Kocok perlahan sebelum analisis."
+    },
+
+    "Sulfat":{
+
+        "wadah":"Botol PE",
+
+        "volume":"500 mL",
+
+        "pengawet":"Tidak perlu",
+
+        "penyimpanan":"4°C",
+
+        "holding_time":"28 hari",
+
+        "catatan":"Simpan dalam wadah tertutup."
+    },
+
+    "Klorida":{
+
+        "wadah":"Botol PE",
+
+        "volume":"500 mL",
+
+        "pengawet":"Tidak perlu",
+
+        "penyimpanan":"4°C",
+
+        "holding_time":"28 hari",
+
+        "catatan":"Hindari kontaminasi garam."
+    },
